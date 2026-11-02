@@ -1,0 +1,11 @@
+{
+  "name": "Nüma",
+  "short_name": "Nüma",
+  "description": "Collar inteligente que aprende cómo es tu perro y te avisa cuando algo cambia.",
+  "lang": "es-AR",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f2e9",
+  "theme_color": "#1d3022",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
