@@ -37,21 +37,34 @@ async function callGemini(apiKey: string, model: string, contents: unknown[], ma
     contents,
     generationConfig: { temperature: 0.5, maxOutputTokens: maxTokens },
   })
-  const models = [model, 'gemini-flash-latest', 'gemini-2.5-flash'].filter((m, i, a) => m && a.indexOf(m) === i)
+  // Si un modelo está saturado, no existe o tarda demasiado, se prueba el siguiente.
+  const models = [model, 'gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-2.5-flash-lite', 'gemini-2.5-flash']
+    .filter((m, i, a) => m && a.indexOf(m) === i)
+  const started = Date.now()
   let lastErr = ''
   for (const m of models) {
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey }, body,
-    })
-    if (r.ok) {
-      const data = await r.json()
-      const text = (data?.candidates?.[0]?.content?.parts ?? []).map((p: { text?: string }) => p.text ?? '').join('').trim()
-      if (text) return { text, model: m }
-      lastErr = 'empty'
-      continue
+    if (Date.now() - started > 45_000) break
+    try {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey }, body,
+        signal: AbortSignal.timeout(20_000),
+      })
+      if (r.ok) {
+        const data = await r.json()
+        const text = (data?.candidates?.[0]?.content?.parts ?? []).map((p: { text?: string }) => p.text ?? '').join('').trim()
+        if (text) return { text, model: m }
+        lastErr = 'empty'
+        console.error('gemini', m, 'respuesta vacía', JSON.stringify(data).slice(0, 300))
+        continue
+      }
+      lastErr = `${r.status}`
+      console.error('gemini', m, r.status, (await r.text()).slice(0, 300))
+      if (r.status === 400 || r.status === 401 || r.status === 403) throw new Error(`gemini:${lastErr}`)
+    } catch (e) {
+      if (e instanceof Error && e.message.startsWith('gemini:')) throw e
+      lastErr = 'timeout'
+      console.error('gemini', m, 'sin respuesta', String(e))
     }
-    lastErr = `${r.status}`
-    if (r.status !== 404) break
   }
   throw new Error(`gemini:${lastErr}`)
 }
@@ -124,7 +137,7 @@ ${lines}
 Alertas recientes:
 ${alertTxt}`
 
-    const apiModel = Deno.env.get('GEMINI_MODEL') || 'gemini-flash-latest'
+    const apiModel = Deno.env.get('GEMINI_MODEL') || 'gemini-flash-lite-latest'
 
     if (action === 'insight') {
       const prompt = `${context}
@@ -158,7 +171,7 @@ Cerrá con una línea en itálica, entre guiones bajos, aclarando que es orienta
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e)
     console.error('numa-ai', msg)
-    if (msg.startsWith('gemini:429')) return json({ error: 'El asistente está con mucha demanda. Probá de nuevo en un minuto.' }, 429)
+    if (msg.startsWith('gemini:429') || msg.startsWith('gemini:5') || msg.startsWith('gemini:timeout')) return json({ error: 'El asistente está con mucha demanda. Probá de nuevo en un minuto.' }, 503)
     if (msg.startsWith('gemini:400') || msg.startsWith('gemini:403')) return json({ error: 'La clave de IA no es válida o no tiene acceso. Revisala en la configuración.' }, 503)
     return json({ error: 'El asistente no está disponible en este momento. Probá de nuevo en unos minutos.' }, 500)
   }

@@ -6,6 +6,8 @@ Nüma es un collar que registra el comportamiento diario de un perro, aprende su
 
 > Como el collar todavía no existe, la app **simula** los datos del collar. Todo lo demás (cuentas, base de datos, alertas, informes, suscripciones y asistente de IA) funciona de verdad.
 
+**App publicada:** https://numa-app-bice.vercel.app
+
 ---
 
 ## Recorrido de la app
@@ -47,7 +49,7 @@ Supabase
 
 - **Frontend:** React 18 + Vite. Sin librerías de UI: sistema visual propio (`src/styles.css`) con la paleta de la marca y la tipografía Manrope.
 - **Backend:** Supabase (Postgres 17, Auth, Edge Functions en Deno).
-- **IA:** Gemini (modelo Flash, nivel gratuito) desde la función `numa-ai`. La clave nunca llega al navegador.
+- **IA:** Gemini (modelos Flash, nivel gratuito) desde la función `numa-ai`. Si un modelo está saturado, prueba el siguiente. La clave nunca llega al navegador.
 - **Hosting:** Vercel.
 
 ## Modelo de datos
