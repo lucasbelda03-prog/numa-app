@@ -9,14 +9,14 @@ export const BAND = 0.10
 export const STORY = { changeStartsDay: 24, normalDay: 21, alertDay: 26 }
 
 export const METRICS = [
-  { code: 'activity_minutes', lower: 'actividad',    name: 'Actividad',                         short: 'Actividad',    unit: 'min activos',          unitShort: 'min',     decimals: 0, icon: 'bolt',    base: 95,   change: -0.36, noise: 0.05 },
-  { code: 'feeding_minutes', lower: 'alimentación',     name: 'Alimentación',                      short: 'Alimentación', unit: 'min comiendo',         unitShort: 'min',     decimals: 1, icon: 'bowl',    base: 11,   change: -0.40, noise: 0.05 },
-  { code: 'rest_quality_pct', lower: 'descanso',    name: 'Calidad del descanso',              short: 'Descanso',     unit: '% sin interrupciones', unitShort: '%',       decimals: 0, icon: 'bed',     base: 82,   change: -0.17, noise: 0.03 },
-  { code: 'sleep_hours', lower: 'sueño',         name: 'Sueño',                             short: 'Sueño',        unit: 'h por día',            unitShort: 'h',       decimals: 1, icon: 'moon',    base: 13.2, change: 0.13,  noise: 0.03 },
-  { code: 'resting_heart_rate', lower: 'frecuencia cardíaca en reposo',  name: 'Frecuencia cardíaca en reposo',     short: 'FC en reposo', unit: 'latidos por minuto',   unitShort: 'lpm',     decimals: 0, icon: 'heart',   base: 76,   change: 0.11,  noise: 0.025 },
-  { code: 'resting_resp_rate', lower: 'respiración en reposo',   name: 'Frecuencia respiratoria en reposo', short: 'Respiración',  unit: 'respiraciones por min', unitShort: 'rpm',    decimals: 0, icon: 'wind',    base: 18,   change: 0.12,  noise: 0.035 },
-  { code: 'drinking_events', lower: 'hidratación',     name: 'Hidratación',                       short: 'Hidratación',  unit: 'veces que tomó agua',  unitShort: 'veces',   decimals: 0, icon: 'drop',    base: 9,    change: -0.06, noise: 0.06 },
-  { code: 'scratching_episodes', lower: 'rascado', name: 'Rascado',                           short: 'Rascado',      unit: 'episodios por día',    unitShort: 'episod.', decimals: 0, icon: 'scratch', base: 6,    change: 0.04,  noise: 0.08 },
+  { code: 'activity_minutes', lower: 'actividad', name: 'Actividad', short: 'Actividad', unit: 'min activos', unitShort: 'min', decimals: 0, icon: 'bolt', base: 95, change: -0.36, noise: 0.05 },
+  { code: 'feeding_minutes', lower: 'alimentación', name: 'Alimentación', short: 'Alimentación', unit: 'min comiendo', unitShort: 'min', decimals: 1, icon: 'bowl', base: 11, change: -0.40, noise: 0.05 },
+  { code: 'rest_quality_pct', lower: 'descanso', name: 'Calidad del descanso', short: 'Descanso', unit: '% sin interrupciones', unitShort: '%', decimals: 0, icon: 'bed', base: 82, change: -0.17, noise: 0.03 },
+  { code: 'sleep_hours', lower: 'sueño', name: 'Sueño', short: 'Sueño', unit: 'h por día', unitShort: 'h', decimals: 1, icon: 'moon', base: 13.2, change: 0.13, noise: 0.03 },
+  { code: 'resting_heart_rate', lower: 'frecuencia cardíaca en reposo', name: 'Frecuencia cardíaca en reposo', short: 'FC en reposo', unit: 'latidos por minuto', unitShort: 'lpm', decimals: 0, icon: 'heart', base: 76, change: 0.11, noise: 0.025 },
+  { code: 'resting_resp_rate', lower: 'respiración en reposo', name: 'Frecuencia respiratoria en reposo', short: 'Respiración', unit: 'respiraciones por min', unitShort: 'rpm', decimals: 0, icon: 'wind', base: 18, change: 0.12, noise: 0.035 },
+  { code: 'drinking_events', lower: 'hidratación', name: 'Hidratación', short: 'Hidratación', unit: 'veces que tomó agua', unitShort: 'veces', decimals: 0, icon: 'drop', base: 9, change: -0.06, noise: 0.06 },
+  { code: 'scratching_episodes', lower: 'rascado', name: 'Rascado', short: 'Rascado', unit: 'episodios por día', unitShort: 'episod.', decimals: 0, icon: 'scratch', base: 6, change: 0.04, noise: 0.08 },
 ]
 export const METRIC = Object.fromEntries(METRICS.map((m) => [m.code, m]))
 
