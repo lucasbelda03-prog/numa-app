@@ -17,21 +17,23 @@ Nüma es un collar que registra el comportamiento diario de un perro, aprende su
 | Registro | Crea su cuenta (email y contraseña). |
 | Onboarding | Carga el perfil del perro, vincula el collar y ve consejos de colocación. |
 | Aprendizaje (días 1–14) | Progreso del patrón habitual y datos del día. Sin alertas todavía. |
-| Inicio | Índice de bienestar (0–100), anillos de actividad, descanso y alimentación, y cada indicador contra su patrón. |
-| Tendencias | Evolución diaria de cada indicador con su rango habitual. |
+| Inicio | Índice de bienestar (0–100), anillos de actividad, descanso y alimentación de hoy, y una tarjeta por área con su estado: «Como siempre», «Un poco distinto» o «Más bajo/alto de lo habitual». |
+| Detalle de un área | Al tocar una tarjeta (actividad, descanso y sueño, alimentación e hidratación, corazón y respiración, piel): gráfico de cada indicador con su rango habitual y una explicación simple. |
 | Alerta | Qué cambió, desde cuándo, qué observar y cuándo consultar. |
 | Informes | Informe para el veterinario (30/60/90 días), compartible y descargable en PDF. |
 | Nüma IA (Premium) | Análisis de la semana y chat con un asistente que conoce los datos del perro. |
 | Planes | Básico (gratis con el collar) y Premium (USD 7/mes, 3 meses sin cargo). Baja desde la app. |
 | Perfil → Simulación | Controles para la demostración: elegir el día de monitoreo (14, 21, 26) o reiniciar. |
 
+**Navegación:** todo sale del Inicio. Cada tarjeta se abre en su propia pantalla y se vuelve con «Inicio» (arriba a la izquierda). El perfil se abre con el ícono de persona (arriba a la derecha); Nüma IA y el informe son las dos tarjetas del final del Inicio.
+
 ### Guion sugerido para la defensa
 1. Crear una cuenta y cargar a **Lola** (golden retriever, 4 años, 29 kg).
 2. Vincular el collar → **Empezar** → ver el período de aprendizaje → **Avanzar simulación al día 14**.
-3. **Perfil → Simulación → Un día normal (día 21)** → mostrar Inicio y Tendencias.
-4. **Perfil → Simulación → Cambio de comportamiento (día 26)** → aparece la notificación → abrir la alerta.
-5. **Armar informe para el veterinario** → mostrar el informe y el botón de compartir.
-6. **Nüma IA** → activar la prueba Premium → generar el análisis y hacer una pregunta.
+3. **Perfil (arriba a la derecha) → Simulación → Un día normal (día 21)** → volver al Inicio y abrir una tarjeta (por ejemplo, Actividad).
+4. **Perfil → Simulación → Cambio de comportamiento (día 26)** → aparece la notificación → tocarla para abrir la alerta.
+5. En la alerta, **Armar informe para el veterinario** → mostrar el informe y el botón de compartir.
+6. En el Inicio, tarjeta **Nüma IA** → activar la prueba Premium → generar el análisis y hacer una pregunta.
 
 ---
 
