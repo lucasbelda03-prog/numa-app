@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Icon, Logo, TrendChart } from '../components.jsx'
+import { Icon, Logo, TrendChart, NavBar } from '../components.jsx'
 import { api, changeHeadline } from '../lib/api.js'
 import {
   METRICS, METRIC, BASELINE_DAYS, windowMean, pctVsBaseline, levelOf, fmtNum, fmtPct, fmtDM,
@@ -50,19 +50,19 @@ export function NewReport({ data, onBack, onCreated, initialNotes = '' }) {
   }
 
   return (
-    <div className="screen"><div className="scroll"><div className="content">
-      <div className="topbar"><button className="icon-btn" onClick={onBack} aria-label="Volver"><Icon name="back" /></button></div>
-      <div><h1 className="title">Informe para el veterinario</h1>
-        <p className="body" style={{ marginTop: 6 }}>Un resumen del día a día de {dog.name} para llevar a la consulta.</p></div>
+    <div className="screen push"><div className="scroll"><div className="page">
+      <NavBar onBack={onBack} backLabel="Volver" />
+      <div><h1 className="large-title">Informe para el veterinario</h1>
+        <p className="body" style={{ marginTop: 8 }}>Un resumen del día a día de {dog.name} para llevar a la consulta.</p></div>
       {!ready ? <p className="callout">Vas a poder armar el informe cuando termine el período de aprendizaje.</p> : <>
         <div className="field"><span>Período</span>
           <div className="segmented" role="group" aria-label="Período">
             {[30, 60, 90].map((p) => <button key={p} type="button" aria-pressed={period === p} onClick={() => setPeriod(p)}>{p} días</button>)}
           </div></div>
         {day < period && <p className="caption">{dog.name} usa Nüma hace {day} días: el informe incluye todo el historial disponible.</p>}
-        <div className="card card-tight">
-          {['Patrón habitual y últimos 7 días de cada indicador', 'Gráficos de actividad y alimentación', 'Alertas del período', 'Tus observaciones'].map((t) => (
-            <div key={t} className="list-row"><div className="icon-chip"><Icon name="check" size={16} stroke={2.6} /></div><div className="grow" style={{ fontSize: 15 }}>{t}</div></div>
+        <div className="group">
+          {['Patrón habitual y últimos días de cada indicador', 'Gráficos de actividad y alimentación', 'Alertas del período', 'Tus observaciones'].map((t) => (
+            <div key={t} className="row"><span className="bubble-ic tint-ic c-leaf" style={{ width: 32, height: 32, borderRadius: 10 }}><Icon name="check" size={16} stroke={2.6} /></span><span className="grow" style={{ fontSize: 15 }}>{t}</span></div>
           ))}
         </div>
         <label className="field"><span>Tus observaciones (opcional)</span>
@@ -98,8 +98,8 @@ export function ReportView({ report, onBack, onSnack }) {
   }
 
   return (
-    <div className="screen"><div className="scroll"><div className="content" style={{ paddingLeft: 14, paddingRight: 14 }}>
-      <div className="topbar no-print"><button className="icon-btn" onClick={onBack} aria-label="Volver"><Icon name="back" /></button><div className="headline">Informe</div></div>
+    <div className="screen push"><div className="scroll"><div className="page" style={{ paddingLeft: 14, paddingRight: 14 }}>
+      <div className="no-print"><NavBar onBack={onBack} backLabel="Volver" title="Informe" /></div>
       <article className="paper">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Logo size={26} />
@@ -123,7 +123,8 @@ export function ReportView({ report, onBack, onSnack }) {
         <p className="caption" style={{ marginTop: 6 }}>* Variación del promedio de los últimos 3 días respecto del patrón habitual.</p>
         {['activity_minutes', 'feeding_minutes'].map((c) => (
           <div key={c}><h4>{METRIC[c].name} ({METRIC[c].unit} por día)</h4>
-            <TrendChart code={c} points={s.charts[c]} baseline={s.baselines[c]} from={s.fromDay} to={s.toDay} start={s.start} height={120} /></div>
+            <TrendChart code={c} points={s.charts[c]} baseline={s.baselines[c]} from={s.fromDay} to={s.toDay} start={s.start} height={120}
+              color={c === 'activity_minutes' ? 'var(--coral)' : 'var(--amber)'} band={c === 'activity_minutes' ? 'var(--coral-50)' : 'var(--amber-50)'} /></div>
         ))}
         <h4>Alertas del período</h4>
         {s.alerts.length ? s.alerts.map((a) => <p key={a.day} style={{ margin: '0 0 4px' }}>{d(a.day)} · {a.headline} (3 días seguidos).</p>) : <p style={{ margin: 0 }}>Sin alertas.</p>}
@@ -140,31 +141,32 @@ export function ReportView({ report, onBack, onSnack }) {
   )
 }
 
-export function ReportsList({ data, onNew, onOpen }) {
+export function ReportsList({ data, onNew, onOpen, onBack }) {
   const { dog, reports } = data
   return (
-    <div className="scroll"><div className="content">
-      <div><h1 className="title">Informes</h1><p className="body" style={{ marginTop: 4 }}>Para compartir con el veterinario de {dog.name}.</p></div>
+    <div className="screen push"><div className="scroll"><div className="page">
+      <NavBar onBack={onBack} />
+      <div><h1 className="large-title">Informes</h1><p className="body" style={{ marginTop: 8 }}>Para compartir con el veterinario de {dog.name}.</p></div>
       <button className="btn btn-primary" onClick={onNew}><Icon name="plus" />Nuevo informe</button>
       {reports.length ? (
-        <div className="card card-tight">
+        <div className="group">
           {reports.map((r) => (
-            <button key={r.id} className="list-row" onClick={() => onOpen(r)}>
-              <div className="icon-chip"><Icon name="file" size={18} /></div>
-              <div className="grow"><div className="title-sm">Informe de {r.period_days} días</div>
-                <div className="sub">{fmtDM(parseISO(r.date_from))} al {fmtDM(parseISO(r.date_to))}</div></div>
-              <Icon name="chevron" size={18} />
+            <button key={r.id} className="row" onClick={() => onOpen(r)}>
+              <span className="bubble-ic tint-ic c-blue"><Icon name="file" size={20} /></span>
+              <span className="grow"><span className="t" style={{ display: 'block' }}>Informe de {r.period_days} días</span>
+                <span className="s" style={{ display: 'block' }}>{fmtDM(parseISO(r.date_from))} al {fmtDM(parseISO(r.date_to))}</span></span>
+              <span style={{ color: '#b2b5ad' }}><Icon name="chevron" size={20} /></span>
             </button>
           ))}
         </div>
       ) : (
         <div className="card" style={{ textAlign: 'center', padding: 28 }}>
-          <div className="icon-chip" style={{ margin: '0 auto 12px', width: 52, height: 52, borderRadius: 16 }}><Icon name="file" size={24} /></div>
-          <div className="headline" style={{ fontSize: 16 }}>Todavía no armaste informes</div>
+          <span className="bubble-ic tint-ic c-blue" style={{ margin: '0 auto 12px', width: 56, height: 56, borderRadius: 18 }}><Icon name="file" size={26} /></span>
+          <div className="headline">Todavía no armaste informes</div>
           <p className="callout" style={{ marginTop: 6 }}>El informe resume el patrón de {dog.name}, los cambios recientes y tus observaciones.</p>
         </div>
       )}
-    </div></div>
+    </div></div></div>
   )
 }
 export { dateToDay }

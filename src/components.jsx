@@ -12,15 +12,12 @@ const P = {
   drop: 'M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z',
   scratch: 'M5 19 15 9 M9 19l8-8 M13 19l6-6',
   bell: 'M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z M10 21a2 2 0 0 0 4 0',
-  lock: 'M5 11h14v9H5z M8 11V8a4 4 0 0 1 8 0v3',
   check: 'm5 12 4 4 10-10',
   bluetooth: 'm7 7 10 10-5 4V3l5 4L7 17',
   share: 'M12 3v12 M7 8l5-5 5 5 M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6',
   file: 'M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z M14 3v5h5 M9 13h6 M9 17h6',
   back: 'm15 5-7 7 7 7',
   chevron: 'm9 5 7 7-7 7',
-  home: 'M4 11 12 4l8 7v9h-5v-6H9v6H4z',
-  chart: 'M4 20V10 M10 20V4 M16 20v-7 M2 20h20',
   spark: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z M19 3v4 M17 5h4',
   user: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M4 21a8 8 0 0 1 16 0',
   info: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 11v6 M12 7.5v.5',
@@ -37,9 +34,10 @@ const P = {
   star: 'm12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.8l6.1-.9z',
   collar: 'M5 15a8 8 0 1 1 14 0 M9 15h6v5H9z',
   mail: 'M3 5h18v14H3z M3 6l9 7 9-7',
-  close: 'M6 6l12 12 M18 6 6 18',
+  calendar: 'M4 6h16v14H4z M4 10h16 M8 3v4 M16 3v4',
+  sliders: 'M4 6h10 M18 6h2 M4 12h4 M12 12h8 M4 18h12 M20 18h0 M14 4v4 M8 10v4 M16 16v4',
 }
-export function Icon({ name, size = 20, stroke = 1.9, className, label }) {
+export function Icon({ name, size = 20, stroke = 2, className, label }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={stroke}
       strokeLinecap="round" strokeLinejoin="round" className={className}
@@ -59,7 +57,7 @@ export function Paw({ size = 20, color = 'currentColor' }) {
 }
 
 /** Logotipo: "nüma" con dos huellas como puntos de la ü. */
-export function Logo({ size = 40, color = 'var(--green)', paws = 'var(--clay)' }) {
+export function Logo({ size = 40, color = 'var(--green)', paws = 'var(--coral)' }) {
   return (
     <span role="img" aria-label="nüma" style={{ fontSize: size, color, fontWeight: 800, letterSpacing: '-0.045em', lineHeight: 1, display: 'inline-flex', alignItems: 'flex-end' }}>
       <span aria-hidden="true">n</span>
@@ -74,11 +72,16 @@ export function Logo({ size = 40, color = 'var(--green)', paws = 'var(--clay)' }
   )
 }
 
-export function Ring({ value, size, stroke, color, track, children, label }) {
-  const r = (size - stroke) / 2
-  const c = 2 * Math.PI * r
+function useAnimated(value) {
   const [p, setP] = useState(0)
   useEffect(() => { const id = requestAnimationFrame(() => setP(Math.max(0, Math.min(100, value ?? 0)))); return () => cancelAnimationFrame(id) }, [value])
+  return p
+}
+
+export function Ring({ value, size, stroke, color, track = '#ecece5', children, label }) {
+  const r = (size - stroke) / 2
+  const c = 2 * Math.PI * r
+  const p = useAnimated(value)
   return (
     <div className="ring" style={{ width: size, height: size }} role={label ? 'img' : undefined} aria-label={label}>
       <svg width={size} height={size} aria-hidden="true">
@@ -92,11 +95,28 @@ export function Ring({ value, size, stroke, color, track, children, label }) {
   )
 }
 
+/** Anillos concéntricos (estilo Apple/Whoop). rings: [{ value 0–100, color, track }] de afuera hacia adentro. */
+export function RingStack({ rings, size = 124, stroke = 13, gap = 3, label, children }) {
+  return (
+    <div className="ring" style={{ width: size, height: size }} role="img" aria-label={label}>
+      {rings.map((rg, i) => {
+        const s = size - i * 2 * (stroke + gap)
+        return (
+          <div key={i} style={{ position: 'absolute', inset: i * (stroke + gap) }}>
+            <Ring value={rg.value} size={s} stroke={stroke} color={rg.color} track={rg.track} />
+          </div>
+        )
+      })}
+      <div className="inner">{children}</div>
+    </div>
+  )
+}
+
 /**
  * Gráfico de línea con rango habitual.
  * points: Array<{day, value}>; baseline: {mean, low, high} | undefined
  */
-export function TrendChart({ code, points, baseline, from, to, width = 340, height = 200, axis = true, start, highlightFrom }) {
+export function TrendChart({ code, points, baseline, from, to, width = 340, height = 200, axis = true, start, color = 'var(--green)', band = 'var(--green-50)', alertColor = 'var(--coral-ink)' }) {
   const m = METRIC[code]
   const pts = points.filter((p) => p.day >= from && p.day <= to)
   if (!pts.length) return <div className="skeleton" style={{ height }} />
@@ -109,31 +129,28 @@ export function TrendChart({ code, points, baseline, from, to, width = 340, heig
   const X = (d) => L + ((d - from) * (width - L - R)) / span
   const Y = (v) => T + ((hi - v) * (height - T - B)) / (hi - lo)
   const learnEnd = Math.min(BASELINE_DAYS, to)
+  const showLearn = axis && from <= BASELINE_DAYS
   const path = pts.map((p, i) => `${i ? 'L' : 'M'}${X(p.day).toFixed(1)} ${Y(p.value).toFixed(1)}`).join(' ')
   const isOut = (v) => baseline && Math.abs((v - baseline.mean) / baseline.mean) >= 0.15
   const last = pts.at(-1)
-  const lineColor = highlightFrom && isOut(last.value) ? 'var(--clay)' : 'var(--green)'
   const ticks = axis ? [lo + pad, (lo + hi) / 2, hi - pad] : []
   const xt = axis && start ? [from, Math.round((from + to) / 2), to] : []
+  const bandX = showLearn ? X(learnEnd) : L
   return (
     <svg width="100%" viewBox={`0 0 ${width} ${height}`} role="img"
       aria-label={`${m.name}: ${pts.length} días. Último valor ${fmtNum(last.value, m.decimals)} ${m.unit}${baseline ? `, patrón habitual ${fmtNum(baseline.mean, m.decimals)}` : ''}.`}>
-      {axis && from <= BASELINE_DAYS && (
+      {showLearn && (
         <>
-          <rect x={L} y={T} width={Math.max(0, X(learnEnd) - L)} height={height - T - B} fill="var(--ink)" opacity=".04" rx="4" />
+          <rect x={L} y={T} width={Math.max(0, X(learnEnd) - L)} height={height - T - B} fill="#f1f1ec" rx="6" />
           <text x={L + 8} y={T + 15} fontSize="10.5" fontWeight="700" fill="var(--ink-3)">Aprendizaje</text>
         </>
       )}
-      {baseline && (
-        <rect x={axis && from <= BASELINE_DAYS ? X(learnEnd) : L} y={Y(baseline.high)}
-          width={width - R - (axis && from <= BASELINE_DAYS ? X(learnEnd) : L)} height={Y(baseline.low) - Y(baseline.high)}
-          fill="var(--sage)" opacity=".7" rx="4" />
-      )}
+      {baseline && <rect x={bandX} y={Y(baseline.high)} width={width - R - bandX} height={Y(baseline.low) - Y(baseline.high)} fill={band} rx="6" />}
       {ticks.map((v, i) => <text key={i} x={L - 7} y={Y(v) + 3.5} fontSize="10.5" fill="var(--ink-3)" textAnchor="end">{fmtNum(v, v < 20 && m.decimals ? 1 : 0)}</text>)}
       {xt.map((d, i) => <text key={i} x={X(d)} y={height - 6} fontSize="10.5" fill="var(--ink-3)" textAnchor={i === 0 ? 'start' : i === 2 ? 'end' : 'middle'}>{fmtDM(dayToDate(start, d))}</text>)}
-      <path d={path} fill="none" stroke={lineColor} strokeWidth={axis ? 2.4 : 2} strokeLinejoin="round" strokeLinecap="round" />
-      {pts.filter((p) => p.day > BASELINE_DAYS && isOut(p.value)).map((p) => <circle key={p.day} cx={X(p.day)} cy={Y(p.value)} r={axis ? 4 : 3} fill="var(--clay)" />)}
-      <circle cx={X(last.day)} cy={Y(last.value)} r={axis ? 5 : 3.5} fill={lineColor} stroke="#fff" strokeWidth="2" />
+      <path d={path} fill="none" stroke={color} strokeWidth={axis ? 2.6 : 2.2} strokeLinejoin="round" strokeLinecap="round" />
+      {pts.filter((p) => p.day > BASELINE_DAYS && isOut(p.value)).map((p) => <circle key={p.day} cx={X(p.day)} cy={Y(p.value)} r={axis ? 4 : 3} fill={alertColor} />)}
+      <circle cx={X(last.day)} cy={Y(last.value)} r={axis ? 5.5 : 3.5} fill={color} stroke="#fff" strokeWidth="2" />
     </svg>
   )
 }
@@ -146,6 +163,17 @@ export function Snackbar({ text, onDone }) {
   const t = useRef()
   useEffect(() => { clearTimeout(t.current); t.current = setTimeout(onDone, 2800); return () => clearTimeout(t.current) }, [text, onDone])
   return <div className="snackbar" role="status">{text}</div>
+}
+
+/** Barra superior con botón volver. */
+export function NavBar({ title, onBack, backLabel = 'Inicio', right }) {
+  return (
+    <div className="nav">
+      {onBack ? <button className="back" onClick={onBack} aria-label={`Volver a ${backLabel}`}><Icon name="back" size={22} stroke={2.4} />{backLabel}</button> : <span style={{ width: 44 }} />}
+      <div className="grow">{title}</div>
+      {right ?? <span style={{ width: 64 }} />}
+    </div>
+  )
 }
 
 /** Markdown mínimo: **negrita**, _itálica_, listas con "- ". */
